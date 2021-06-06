@@ -21,7 +21,7 @@ const filePrefix = "https://allotropeijk.blob.core.windows.net/2021summerexhibit
 let videoTexture: Nullable<VideoTexture> = null;
 
 async function loadContentAsync(): Promise<void> {
-    const meshData = await SceneLoader.ImportMeshAsync(null, filePrefix, "home.04.glb", scene);
+    const meshData = await SceneLoader.ImportMeshAsync(null, filePrefix, "home.05.glb", scene);
     videoTexture = new VideoTexture("videoTexture", `${filePrefix}noise.02.mp4`, scene, false, true);
     const videoMaterial = new StandardMaterial("videoMaterial", scene);
     videoMaterial.diffuseTexture = videoTexture;
