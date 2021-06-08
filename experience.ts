@@ -16,29 +16,34 @@ scene.createDefaultLight(true);
 
 // Switch between local and cloud file locations
 const filePrefix = "https://allotropeijk.blob.core.windows.net/2021summerexhibit/";
-//const filePrefix = "/resources/";
+// const filePrefix = "/resources/";
+const floorMaterialName = "floor.001";
+const roomMaterialName = "room.002";
 
 let videoTexture: Nullable<VideoTexture> = null;
 
 async function loadContentAsync(): Promise<void> {
-    const meshData = await SceneLoader.ImportMeshAsync(null, filePrefix, "home.05.glb", scene);
-    videoTexture = new VideoTexture("videoTexture", `${filePrefix}noise.02.mp4`, scene, false, true);
+    const meshData = await SceneLoader.ImportMeshAsync(null, filePrefix, "home.07.glb", scene);
+    videoTexture = new VideoTexture("videoTexture", `${filePrefix}noise.04.mp4`, scene, false, true);
     const videoMaterial = new StandardMaterial("videoMaterial", scene);
     videoMaterial.diffuseTexture = videoTexture;
     videoMaterial.emissiveTexture = videoTexture;
+    videoMaterial.backFaceCulling = false;
     meshData.meshes.forEach((mesh) => {
         if (!!mesh.material &&
-            mesh.material.name == "room.001")
+            mesh.material.name == roomMaterialName)
         {
             // Apply video material to room meshes
             mesh.material = videoMaterial;
         }
         else if (!!mesh.material &&
-            mesh.material.name == "floor")
+            mesh.material.name == floorMaterialName)
         {
             // Convert plain floor plane to wireframe
             mesh.material.wireframe = true;
         }
+
+        console.log(`Mesh Loaded: ${mesh.name}, num vertices: ${mesh.getTotalVertices()} num indices: ${mesh.getTotalIndices()}`);
     });
 }
 
@@ -72,7 +77,7 @@ async function start(): Promise<void> {
     await loadContentAsync();
 
     // Setup floor meshes that will allow user to move around the scene
-    const floorMeshes = scene.meshes.filter((mesh) => { return mesh.material?.name === "floor" ?? false; });
+    const floorMeshes = scene.meshes.filter((mesh) => { return mesh.material?.name === floorMaterialName ?? false; });
 
     if (!supported)
     {
