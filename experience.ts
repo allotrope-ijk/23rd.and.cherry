@@ -1,8 +1,8 @@
-import { ArcRotateCamera, Color3, Color4, Engine, Nullable, Scene, SceneLoader, StandardMaterial, Vector3, VideoTexture, WebXRSessionManager } from "@babylonjs/core";
+import { UniversalCamera, Color3, Color4, Engine, Nullable, Scene, SceneLoader, StandardMaterial, Vector3, VideoTexture, WebXRSessionManager } from "@babylonjs/core";
 import "@babylonjs/loaders";
 
-//const DEBUG_PC = true;
-const DEBUG_PC = false;
+const DEBUG_PC = true;
+//const DEBUG_PC = false;
 
 const renderCanvas = <HTMLCanvasElement> document.getElementById("renderCanvas");
 renderCanvas.hidden = true;
@@ -81,19 +81,16 @@ async function start(): Promise<void> {
 
     if (!supported)
     {
-        const camera: ArcRotateCamera = new ArcRotateCamera("ArcCamera", Math.PI / 2, Math.PI / 2, 1, Vector3.Zero(), scene);
-        scene.setActiveCameraByName("ArcCamera");
-        scene.clearColor = new Color4(0, 0, 0);
+        const camera: UniversalCamera = new UniversalCamera("UniversalCamera", new Vector3(0, 1.4, 0), scene);
+        camera.speed = 0.1;
+        camera.target = new Vector3(camera.position.x, camera.position.y, -5);
+        scene.setActiveCameraByName("UniversalCamera");
         camera.attachControl(renderCanvas, true);
         image.onclick = async () => {
             image.hidden = true;
             renderCanvas.hidden = false;
             videoTexture?.video.play();
         };
-
-        scene.meshes.forEach((mesh) => {
-            mesh.position.y -= 0.4;
-        });
 
         // Change the html image to state that the xr experience is ready to enter
         image.src = `${filePrefix}23rdAndCherryEnter.png`;
