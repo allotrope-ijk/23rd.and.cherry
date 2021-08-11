@@ -1,8 +1,8 @@
 import { UniversalCamera, Color3, Color4, Engine, Nullable, Scene, SceneLoader, StandardMaterial, Vector3, VideoTexture, WebXRSessionManager } from "@babylonjs/core";
 import "@babylonjs/loaders";
 
-const DEBUG_PC = true;
-//const DEBUG_PC = false;
+//const DEBUG_PC = true;
+const DEBUG_PC = false;
 
 const renderCanvas = <HTMLCanvasElement> document.getElementById("renderCanvas");
 renderCanvas.hidden = true;
@@ -61,12 +61,21 @@ function onXRInit(): void {
     });
 
     // Setup a transparent black clearColor/background
-    scene.clearColor = new Color4(0, 0, 0, 0);
+    scene.clearColor = new Color4(0, 0, 0, 1);
+
+    image.hidden = true;
+    renderCanvas.hidden = false;
+    videoTexture?.video.play();
 }
 
 async function start(): Promise<void> {
     // Check if vr is supported. If not, exit experience
-    const supported = await WebXRSessionManager.IsSessionSupportedAsync("immersive-vr")
+    let supported = await WebXRSessionManager.IsSessionSupportedAsync("immersive-vr");
+    if (!supported)
+    {
+        supported = await WebXRSessionManager.IsSessionSupportedAsync("immersive-ar");
+    }
+
     if (!supported && !DEBUG_PC)
     {
         image.src = `${filePrefix}23rdAndCherryFailure.png`;
@@ -87,9 +96,8 @@ async function start(): Promise<void> {
         scene.setActiveCameraByName("UniversalCamera");
         camera.attachControl(renderCanvas, true);
         image.onclick = async () => {
-            image.hidden = true;
-            renderCanvas.hidden = false;
-            videoTexture?.video.play();
+            onXRInit();
+            engine.resize();
         };
 
         // Change the html image to state that the xr experience is ready to enter
@@ -108,9 +116,6 @@ async function start(): Promise<void> {
     // Add event callback for button click to enter xr
     image.onclick = async () => {
         await xr.baseExperience.enterXRAsync("immersive-vr", "bounded-floor");
-        image.hidden = true;
-        renderCanvas.hidden = false;
-        videoTexture?.video.play();
     };
 
     // Change the html image to state that the xr experience is ready to enter
